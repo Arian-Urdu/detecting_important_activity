@@ -28,7 +28,7 @@ from pose_format.tensorflow.pose_body import TF_POSE_RECORD_DESCRIPTION
 from pose_format.utils.reader import BufferReader
 import tensorflow as tf
 
-from sign_language_detection.args import FLAGS
+from args import FLAGS
 
 
 @functools.lru_cache(maxsize=1)

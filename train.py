@@ -23,9 +23,9 @@ from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.callbacks import ModelCheckpoint
 from tensorflow.keras.models import load_model
 
-from sign_language_detection.args import FLAGS
-from sign_language_detection.dataset import get_datasets
-from sign_language_detection.model import build_model
+from args import FLAGS
+from dataset import get_datasets
+from model import build_model
 
 
 def set_seed():

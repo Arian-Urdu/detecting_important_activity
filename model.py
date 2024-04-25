@@ -17,7 +17,7 @@
 
 import tensorflow as tf
 
-from sign_language_detection.args import FLAGS
+from args import FLAGS
 
 
 def input_size():
