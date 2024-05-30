@@ -19,9 +19,9 @@ import random
 
 from absl import app
 import tensorflow as tf
-from tensorflow.keras.callbacks import EarlyStopping
-from tensorflow.keras.callbacks import ModelCheckpoint
-from tensorflow.keras.models import load_model
+# from tf.keras.callbacks import EarlyStopping
+# from tf.keras.callbacks import ModelCheckpoint
+# from tf.keras.models import load_model
 
 from args import FLAGS
 from dataset import get_datasets
@@ -47,12 +47,12 @@ def main(unused_argv):
   model = build_model()
 
   # Train
-  es = EarlyStopping(
+  es = tf.keras.callbacks.EarlyStopping(
       monitor='val_accuracy',
       mode='max',
       verbose=1,
       patience=FLAGS.stop_patience)
-  mc = ModelCheckpoint(
+  mc = tf.keras.callbacks.ModelCheckpoint(
       FLAGS.model_path,
       monitor='val_accuracy',
       mode='max',
@@ -67,7 +67,7 @@ def main(unused_argv):
         validation_data=dev,
         callbacks=[es, mc])
 
-  best_model = load_model(FLAGS.model_path)
+  best_model = tf.keras.models.load_model(FLAGS.model_path)
   print('Testing')
   best_model.evaluate(test)
 
