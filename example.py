@@ -71,6 +71,7 @@ def optical_flow(src, fps):
   # Remove "people" dimension
   src = src.squeeze(1)
 
+  print(src)
   # Differentiate Frames
   src = differentiate_frames(src)
 
@@ -88,6 +89,7 @@ minimum_fps = tf.constant(1, dtype=tf.float32)
 def load_datum(tfrecord_dict):
   """Convert tfrecord dictionary to tensors."""
   pose_body = TensorflowPoseBody.from_tfrecord(tfrecord_dict)
+ 
   pose = Pose(header=get_openpose_header(), body=pose_body)
   #tgt = tf.io.decode_raw(tfrecord_dict["is_signing"], out_type=tf.int8)
 
@@ -96,15 +98,15 @@ def load_datum(tfrecord_dict):
 
   # Get only relevant input components
   #pose = pose.get_components(FLAGS.input_components)
-  
   datum = {
       "fps": pose.body.fps,
       "pose_data_tensor": pose.body.data.tensor,
       "pose_data_mask": pose.body.data.mask,
       "pose_confidence": pose.body.confidence,
-    }
-  return datum
+  }
 
+  print(datum)
+  return datum
 def get_input(datum,
                   augment=False):
   
@@ -127,7 +129,9 @@ def get_input(datum,
 
   flow = optical_flow(pose.body.data, fps)
 
-  return flow
+ # Debugging: Check shapes of tensors
+  print(flow)
+  return {"src": flow}
 
 # Define the feature description
 feature_description = {
@@ -159,24 +163,48 @@ def tfrecord_to_dict(tfrecord_file):
     # Convert the parsed dataset to a dictionary of lists
     for parsed_record in parsed_dataset:
         records_dict['fps'].append(parsed_record['fps'].numpy())
-        records_dict['pose_data'].append(tf.io.parse_tensor(parsed_record['pose_data'], out_type=tf.float32).numpy())
+        records_dict['pose_data'].append(tf.io.parse_tensor(parsed_record['pose_data'], out_type=tf.string).numpy())
         records_dict['pose_confidence'].append(tf.io.parse_tensor(parsed_record['pose_confidence'], out_type=tf.float32).numpy())
         
     return records_dict
 
+def recover(_, y):
+    return y
+
+def prepare_io(datum):
+  """Convert dictionary into input-output tuple for Keras."""
+  src = datum["src"]
+  print(src)
+  return src
+
+
+def batch_dataset(dataset, batch_size):
+  """Batch and pad a dataset."""
+  dataset = dataset.padded_batch(
+      batch_size, padded_shapes={
+          "src": [None, None]
+      })
+
+  return dataset.map(prepare_io)
+
+BATCH_SIZE = 1
+AUTOTUNE = tf.data.experimental.AUTOTUNE
+
+
 # Path to the TFRecord file
 tfrecord_file = 'sample.tfrecord'
 
-# Convert the TFRecord to a dictionary of lists
-records_dict = tfrecord_to_dict(tfrecord_file)
+# Create a dataset from the TFRecord file
+raw_dataset = tf.data.TFRecordDataset(tfrecord_file)
 
-print(records_dict['fps'][1])
+# Parse and process the dataset
+dataset = raw_dataset.map(_parse_function)
+dataset = dataset.map(load_datum)
+dataset = dataset.map(get_input)
 
-# Load datum and print the result
-#datum = load_datum(records_dict)
+# Batch and prefetch the dataset
+dataset = batch_dataset(dataset, BATCH_SIZE)
 
-# Get input and print the result
-#inputs = get_input(datum)
 
 # Load the trained model
 model_path = 'models/py/model.h5'
@@ -185,9 +213,9 @@ model = tf.keras.models.load_model(model_path)
 # Display model summary
 model.summary()
 
-x = model.predict(1)
-
-with open('output.txt', 'w') as f:
-    # Writing to the file using the print function
-    print('Output:', file=f)
-    print(x, file=f)
+# For demonstration purposes, we'll take one batch from the dataset
+for batch in dataset.take(1):
+    #print(f"using: {batch}")
+    print("Running Model...")
+    predictions = model(batch)
+    print(predictions)

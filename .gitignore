@@ -158,3 +158,22 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
+args.py
+data/example.tfrecord
+data/example1.tfrecord
+data/example2.tfrecord
+data/example3.tfrecord
+data/example4.tfrecord
+sample4.tfrecord
+examples/hello_test.mp4
+examples/create_tfrecord.py
+examples/read_tfrecord.py
+examples/sample_openpose_small.json
+examples/sample_openpose.json
+examples/sample.mp4
+examples/sample.tfrecord
+examples/tfrecord.py
+examples/tfrecord2.py
+models/saved_model.pb
+models/variables/variables.data-00000-of-00001
+models/variables/variables.index

@@ -21,8 +21,8 @@ FLAGS = flags.FLAGS
 # Training flags
 flags.DEFINE_integer('seed', 1, 'Random seed')
 flags.DEFINE_string('device', '/CPU:0', 'Tensorflow device')
-flags.DEFINE_string('model_path', '/tmp/model.h5', 'Path to save trained model')
-flags.DEFINE_integer('epochs', 100, 'Maximum number of epochs')
+flags.DEFINE_string('model_path', 'models', 'Path to save trained model')
+flags.DEFINE_integer('epochs', 2, 'Maximum number of epochs')
 flags.DEFINE_integer('steps_per_epoch', 32, 'Number of batches per epoch')
 flags.DEFINE_float('learning_rate', 0.001, 'Learning rate')
 flags.DEFINE_integer('stop_patience', 10, 'Patience for early stopping')
@@ -41,10 +41,16 @@ flags.DEFINE_multi_string(
     'face_keypoints_2d, hand_left_keypoints_2d, hand_right_keypoints_2d)'
 )
 
+# Transformer-specific flags
+flags.DEFINE_integer('transformer_encoder_layers', 2, 'Number of Transformer layers')
+flags.DEFINE_integer('num_heads', 4, 'Number of attention heads in Transformer layers')
+flags.DEFINE_integer('ff_dim', 2**6, 'Feed-forward dimension in Transformer layers')
+flags.DEFINE_float('transformer_dropout', 0.1, 'Dropout rate in Transformer layers')
+
 # Augmentation flags
 flags.DEFINE_float('frame_dropout_std', 0.01, 'Augmentation drop frames std')
 
 # Dataset flags
-flags.DEFINE_string('dataset_path', None, 'Location of tfrecord file')
+flags.DEFINE_string('dataset_path', "data/example.tfrecord", 'Location of tfrecord file')
 
 flags.mark_flag_as_required('dataset_path')

@@ -26,6 +26,7 @@ import tensorflow as tf
 from args import FLAGS
 from dataset import get_datasets
 from model import build_model
+from transformer_model import build_transformer_model
 
 
 def set_seed():
@@ -43,8 +44,21 @@ def main(unused_argv):
   # Initialize Dataset
   train, dev, test = get_datasets()
 
+ # Print shapes for debugging
+  for src, tgt in train.take(1):
+    print("Source shape:", src.shape)
+    print("Target shape:", tgt.shape)
+    input_shape = (src.shape[1], src.shape[2])  # (sequence_length, feature_dim)
+    break
+
   # Initialize Model
-  model = build_model()
+  #model = build_model()
+  #model = build_transformer_model()
+
+
+  # Adjust model input shape if necessary
+  input_shape = (None, src.shape[-1])  # Dynamic sequence length, feature dimension
+  model = build_transformer_model(input_shape)
 
   # Train
   es = tf.keras.callbacks.EarlyStopping(

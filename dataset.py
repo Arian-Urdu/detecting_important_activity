@@ -150,18 +150,21 @@ def prepare_io(datum):
   src = datum["src"]
   tgt = datum["tgt"]
 
+  # Ensure tgt is a 2D tensor with shape (batch_size, 1)
+  tgt = tf.expand_dims(tgt, axis=-1)
+
   return src, tgt
 
 
 def batch_dataset(dataset, batch_size):
-  """Batch and pad a dataset."""
-  dataset = dataset.padded_batch(
-      batch_size, padded_shapes={
-          "src": [None, None],
-          "tgt": [None]
-      })
+    """Batch and pad a dataset."""
+    dataset = dataset.padded_batch(
+        batch_size, padded_shapes={
+            "src": [None, None],
+            "tgt": [None]
+        })
 
-  return dataset.map(prepare_io)
+    return dataset.map(prepare_io)
 
 
 def train_pipeline(dataset):

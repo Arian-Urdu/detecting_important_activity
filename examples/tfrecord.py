@@ -3,7 +3,7 @@ import numpy as np
 import tensorflow as tf
 
 # Load the JSON data
-with open('examples/sample_openpose.json') as f:
+with open('examples/sample_openpose_small.json') as f:
     data = json.load(f)
 
 # Function to create a feature for the tf.train.Example
