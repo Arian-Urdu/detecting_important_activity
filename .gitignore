@@ -177,3 +177,4 @@ examples/tfrecord2.py
 models/saved_model.pb
 models/variables/variables.data-00000-of-00001
 models/variables/variables.index
+wandb/*
