@@ -22,11 +22,11 @@ FLAGS = flags.FLAGS
 flags.DEFINE_integer('seed', 1, 'Random seed')
 flags.DEFINE_string('device', '/CPU:0', 'Tensorflow device')
 flags.DEFINE_string('model_path', 'models', 'Path to save trained model')
-flags.DEFINE_integer('epochs', 2, 'Maximum number of epochs')
-flags.DEFINE_integer('steps_per_epoch', 32, 'Number of batches per epoch')
+flags.DEFINE_integer('epochs', 1, 'Maximum number of epochs')
+flags.DEFINE_integer('steps_per_epoch', 150, 'Number of batches per epoch')
 flags.DEFINE_float('learning_rate', 0.001, 'Learning rate')
 flags.DEFINE_integer('stop_patience', 10, 'Patience for early stopping')
-flags.DEFINE_integer('batch_size', 8, 'Batch size for training')
+flags.DEFINE_integer('batch_size', 2, 'Batch size for training')
 flags.DEFINE_integer('test_batch_size', 1, 'Batch size for evaluation')
 
 # Model flags
@@ -44,7 +44,7 @@ flags.DEFINE_multi_string(
 # Transformer-specific flags
 flags.DEFINE_integer('transformer_encoder_layers', 2, 'Number of Transformer layers')
 flags.DEFINE_integer('num_heads', 4, 'Number of attention heads in Transformer layers')
-flags.DEFINE_integer('ff_dim', 2**6, 'Feed-forward dimension in Transformer layers')
+flags.DEFINE_integer('ff_dim', 2**7, 'Feed-forward dimension in Transformer layers')
 flags.DEFINE_float('transformer_dropout', 0.1, 'Dropout rate in Transformer layers')
 
 # Augmentation flags
