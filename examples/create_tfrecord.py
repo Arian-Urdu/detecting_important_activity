@@ -19,8 +19,8 @@ import numpy as np
 import tensorflow as tf
 
 with tf.io.TFRecordWriter('example.tfrecord') as writer:
-  for _ in range(5):  # Iterate over 5 examples
-    frames = 100  # Number of frames in the example video
+  for _ in range(50):  # Iterate over 5 examples
+    frames = 2500  # Number of frames in the example video
     fps = 25  # FPS in the example video
 
     is_signing = np.random.randint(

@@ -22,10 +22,25 @@ import tensorflow as tf
 # from tf.keras.callbacks import EarlyStopping
 # from tf.keras.callbacks import ModelCheckpoint
 # from tf.keras.models import load_model
+import wandb
 
 from args import FLAGS
 from dataset import get_datasets
 from model import build_model
+
+
+
+class WandbStepLogger(tf.keras.callbacks.Callback):
+    def __init__(self):
+        super().__init__()
+        self.step = 0
+
+    def on_train_batch_end(self, batch, logs=None):
+        self.step += 1
+        wandb.log({"train_loss": logs["loss"], "train_accuracy": logs["accuracy"]}, step=self.step)
+
+    def on_test_batch_end(self, batch, logs=None):
+        wandb.log({"val_loss": logs["loss"], "val_accuracy": logs["accuracy"]}, step=self.step)
 
 
 def set_seed():
@@ -35,10 +50,14 @@ def set_seed():
   random.seed(seed)
 
 
+
 def main(unused_argv):
   """Keras training loop with early-stopping and model checkpoint."""
 
   set_seed()
+
+  # Initialize wandb
+  wandb.init(project="sign_language_detection", config=FLAGS)
 
   # Initialize Dataset
   train, dev, test = get_datasets()
@@ -52,25 +71,37 @@ def main(unused_argv):
       mode='max',
       verbose=1,
       patience=FLAGS.stop_patience)
-  mc = tf.keras.callbacks.ModelCheckpoint(
+  mc = tf.keras.callbacks.ModelCheckpoint(  
       FLAGS.model_path,
       monitor='val_accuracy',
       mode='max',
       verbose=1,
       save_best_only=True)
-
+  
+  # Add custom WandbStepLogger
+  wandb_step_logger = WandbStepLogger()
+  
   with tf.device(FLAGS.device):
     model.fit(
         train,
         epochs=FLAGS.epochs,
         steps_per_epoch=FLAGS.steps_per_epoch,
         validation_data=dev,
-        callbacks=[es, mc])
+        callbacks=[es, mc, wandb_step_logger])
 
   best_model = tf.keras.models.load_model(FLAGS.model_path)
   print('Testing')
   best_model.evaluate(test)
+  test_results = best_model.evaluate(test)
 
+  # Log test results to wandb
+  # wandb.log({
+  #       "test_loss": test_results[0],
+  #       "test_accuracy": test_results[1]
+  #   })
 
+  # Finish wandb run
+  wandb.finish()
+  
 if __name__ == '__main__':
   app.run(main)
